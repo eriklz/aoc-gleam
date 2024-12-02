@@ -1,5 +1,5 @@
-import gleeunit/should
 import aoc2024/day02
+import gleeunit/should
 
 const input = "7 6 4 2 1
 1 2 7 8 9
