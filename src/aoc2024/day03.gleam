@@ -1,10 +1,10 @@
 import aocutil
-import gleam/regexp.{Match}
 import gleam/int
 import gleam/io
 import gleam/list
-import gleam/result
 import gleam/option.{Some}
+import gleam/regexp.{Match}
+import gleam/result
 
 pub fn part1(input) {
   find_multiplications(input)
@@ -14,10 +14,8 @@ pub fn part1(input) {
 }
 
 pub fn part2(input) {
-  let filtered_list = find_multiplications_and_toggles(input)
+  find_multiplications_and_toggles(input)
   |> filter_multiplications
-  
-  filtered_list
   |> list.map(extract_numbers)
   |> list.map(multiply_pair)
   |> int.sum
@@ -37,30 +35,40 @@ fn string_to_int(input) {
 
 fn find_multiplications(input: String) {
   let options = regexp.Options(case_insensitive: False, multi_line: True)
-  let assert Ok(re) = regexp.compile("mul\\((\\d{1,3}),(\\d{1,3})\\)", with: options)
+  let assert Ok(re) =
+    regexp.compile("mul\\((\\d{1,3}),(\\d{1,3})\\)", with: options)
   regexp.scan(with: re, content: input)
 }
 
 fn find_multiplications_and_toggles(input: String) {
   let options = regexp.Options(case_insensitive: False, multi_line: True)
-  let assert Ok(re) = regexp.compile("(mul\\((\\d{1,3}),(\\d{1,3})\\)|do\\(\\)|don't\\(\\))", with: options)
+  let assert Ok(re) =
+    regexp.compile(
+      "(mul\\((\\d{1,3}),(\\d{1,3})\\)|do\\(\\)|don't\\(\\))",
+      with: options,
+    )
   regexp.scan(with: re, content: input)
 }
 
 fn filter_multiplications(matches) {
-  let #(_, filtered_list) = list.fold(matches, #(True, []), fn (acc, match) {
-    let #(toogle, list) = acc
-    case match {
-      Match("do()", _) -> #(True, list) 
-      Match("don't()", _) -> #(False, list)
-      Match(m, [_, val1, val2]) if toogle -> #(toogle, [Match(m, [val1, val2]), ..list])
-      _ -> acc
-    }
-  })
+  let #(_, filtered_list) =
+    list.fold(matches, #(True, []), fn(acc, match) {
+      let #(toogle, list) = acc
+      case match {
+        Match("do()", _) -> #(True, list)
+        Match("don't()", _) -> #(False, list)
+        Match(m, [_, val1, val2]) if toogle -> #(toogle, [
+          Match(m, [val1, val2]),
+          ..list
+        ])
+        _ -> acc
+      }
+    })
   filtered_list
 }
 
-type Pair = #(Int, Int)
+type Pair =
+  #(Int, Int)
 
 fn multiply_pair(tuple: Pair) {
   tuple.0 * tuple.1
@@ -68,8 +76,10 @@ fn multiply_pair(tuple: Pair) {
 
 fn extract_numbers(match) {
   case match {
-    Match(_, [Some(val1), Some(val2)]) ->  #(string_to_int(val1), string_to_int(val2))
+    Match(_, [Some(val1), Some(val2)]) -> #(
+      string_to_int(val1),
+      string_to_int(val2),
+    )
     _ -> #(0, 0)
   }
 }
-
